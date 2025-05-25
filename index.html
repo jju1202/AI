@@ -1,43 +1,82 @@
-<script type="text/javascript">
-document.addEventListener("DOMContentLoaded", () => {
-    const URL = "https://teachablemachine.withgoogle.com/models/aDImkDhZz/";
-    let model, webcam, labelContainer, maxPredictions;
-
-    async function init() {
-        const modelURL = URL + "model.json";
-        const metadataURL = URL + "metadata.json";
-
-        model = await tmImage.load(modelURL, metadataURL);
-        maxPredictions = model.getTotalClasses();
-
-        const flip = true;
-        webcam = new tmImage.Webcam(200, 200, flip);
-        await webcam.setup();
-        await webcam.play();
-        window.requestAnimationFrame(loop);
-
-        document.getElementById("webcam-container").appendChild(webcam.canvas);
-        labelContainer = document.getElementById("label-container");
-        for (let i = 0; i < maxPredictions; i++) {
-            labelContainer.appendChild(document.createElement("div"));
-        }
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MBTI J/P 유형 테스트</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      max-width: 800px;
+      margin: auto;
     }
-
-    async function loop() {
-        webcam.update();
-        await predict();
-        window.requestAnimationFrame(loop);
+    h1 {
+      text-align: center;
     }
-
-    async function predict() {
-        const prediction = await model.predict(webcam.canvas);
-        for (let i = 0; i < maxPredictions; i++) {
-            const classPrediction =
-                prediction[i].className + ": " + prediction[i].probability.toFixed(2);
-            labelContainer.childNodes[i].innerHTML = classPrediction;
-        }
+    .question {
+      margin-bottom: 20px;
     }
+    .result {
+      font-size: 1.2em;
+      font-weight: bold;
+      margin-top: 30px;
+    }
+  </style>
+</head>
+<body>
+  <h1>MBTI J/P 유형 테스트</h1>
+  <form id="quizForm">
+    <div id="questions"></div>
+    <button type="submit">결과 보기</button>
+  </form>
+  <div class="result" id="result"></div>
 
-    window.init = init;
-});
-</script>
+  <script>
+    const questions = [
+      "중요한 일을 앞두고는 계획표나 할 일 목록을 먼저 작성하는 편이다.",
+      "여행을 떠나기 전, 숙소, 식사, 방문 장소 등을 미리 예약하고 정리하는 것이 좋다.",
+      "마감 기한이 정해져 있으면 가능한 한 일찍 끝내놓고 여유를 갖는 편이다.",
+      "갑작스런 약속이나 일정 변경은 스트레스를 준다.",
+      "일을 시작하기 전에 전체적인 구조와 순서를 정해두는 것이 중요하다.",
+      "일이나 과제가 끝난 후 체크리스트에 체크하는 것이 만족스럽다.",
+      "\"해야 할 일\"을 미루기보다 가능한 빨리 처리하려고 한다.",
+      "일정을 세세하게 정리해두는 달력이나 플래너를 자주 활용한다.",
+      "긴 주말이나 휴일에도 계획이 없는 것은 불안하게 느껴진다.",
+      "여러 가지 선택지가 있을 때, 빠르게 결정하고 그 결정에 따라 행동하는 편이다."
+    ];
+
+    const container = document.getElementById("questions");
+
+    questions.forEach((question, index) => {
+      const div = document.createElement("div");
+      div.classList.add("question");
+      div.innerHTML = `
+        <p>${index + 1}. ${question}</p>
+        <label><input type="radio" name="q${index}" value="0" required> 전혀 그렇지 않다 (0점)</label><br>
+        <label><input type="radio" name="q${index}" value="1"> 약간 그렇다 (1점)</label><br>
+        <label><input type="radio" name="q${index}" value="2"> 매우 그렇다 (2점)</label>
+      `;
+      container.appendChild(div);
+    });
+
+    document.getElementById("quizForm").addEventListener("submit", function(event) {
+      event.preventDefault();
+      let score = 0;
+      for (let i = 0; i < questions.length; i++) {
+        const value = parseInt(document.querySelector(`input[name='q${i}']:checked`).value);
+        score += value;
+      }
+
+      let resultText = "";
+      if (score >= 16) resultText = `총점 ${score}점: 강한 계획형(J)`;
+      else if (score >= 11) resultText = `총점 ${score}점: 약한 계획형(J)`;
+      else if (score >= 6) resultText = `총점 ${score}점: 약한 인식형(P)`;
+      else resultText = `총점 ${score}점: 강한 인식형(P)`;
+
+      document.getElementById("result").innerText = resultText;
+    });
+  </script>
+</body>
+</html>
+
