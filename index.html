@@ -6,31 +6,56 @@
   <title>MBTI J/P 유형 테스트</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      padding: 20px;
-      max-width: 800px;
-      margin: auto;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to right, #f0f4ff, #d6e0f0);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
     }
-    h1 {
+    .container {
+      background-color: white;
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      max-width: 500px;
+      width: 90%;
       text-align: center;
     }
     .question {
+      font-size: 1.2em;
       margin-bottom: 20px;
     }
+    .options label {
+      display: block;
+      margin: 10px 0;
+    }
+    .button {
+      padding: 10px 20px;
+      font-size: 1em;
+      background-color: #4a90e2;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+    .button:hover {
+      background-color: #357ab7;
+    }
     .result {
-      font-size: 1.2em;
+      font-size: 1.3em;
       font-weight: bold;
       margin-top: 30px;
     }
   </style>
 </head>
 <body>
-  <h1>MBTI J/P 유형 테스트</h1>
-  <form id="quizForm">
-    <div id="questions"></div>
-    <button type="submit">결과 보기</button>
-  </form>
-  <div class="result" id="result"></div>
+  <div class="container">
+    <div id="quiz"></div>
+    <div class="result" id="result"></div>
+  </div>
 
   <script>
     const questions = [
@@ -40,43 +65,57 @@
       "갑작스런 약속이나 일정 변경은 스트레스를 준다.",
       "일을 시작하기 전에 전체적인 구조와 순서를 정해두는 것이 중요하다.",
       "일이나 과제가 끝난 후 체크리스트에 체크하는 것이 만족스럽다.",
-      "\"해야 할 일\"을 미루기보다 가능한 빨리 처리하려고 한다.",
+      "'해야 할 일'을 미루기보다 가능한 빨리 처리하려고 한다.",
       "일정을 세세하게 정리해두는 달력이나 플래너를 자주 활용한다.",
       "긴 주말이나 휴일에도 계획이 없는 것은 불안하게 느껴진다.",
       "여러 가지 선택지가 있을 때, 빠르게 결정하고 그 결정에 따라 행동하는 편이다."
     ];
 
-    const container = document.getElementById("questions");
+    let currentQuestion = 0;
+    let totalScore = 0;
 
-    questions.forEach((question, index) => {
-      const div = document.createElement("div");
-      div.classList.add("question");
-      div.innerHTML = `
-        <p>${index + 1}. ${question}</p>
-        <label><input type="radio" name="q${index}" value="0" required> 전혀 그렇지 않다 (0점)</label><br>
-        <label><input type="radio" name="q${index}" value="1"> 약간 그렇다 (1점)</label><br>
-        <label><input type="radio" name="q${index}" value="2"> 매우 그렇다 (2점)</label>
+    function showQuestion() {
+      const quiz = document.getElementById("quiz");
+      quiz.innerHTML = `
+        <div class="question">${currentQuestion + 1}. ${questions[currentQuestion]}</div>
+        <div class="options">
+          <label><input type="radio" name="answer" value="0"> 전혀 그렇지 않다 (0점)</label>
+          <label><input type="radio" name="answer" value="1"> 약간 그렇다 (1점)</label>
+          <label><input type="radio" name="answer" value="2"> 매우 그렇다 (2점)</label>
+        </div>
+        <button class="button" onclick="nextQuestion()">다음</button>
       `;
-      container.appendChild(div);
-    });
+    }
 
-    document.getElementById("quizForm").addEventListener("submit", function(event) {
-      event.preventDefault();
-      let score = 0;
-      for (let i = 0; i < questions.length; i++) {
-        const value = parseInt(document.querySelector(`input[name='q${i}']:checked`).value);
-        score += value;
+    function nextQuestion() {
+      const selected = document.querySelector("input[name='answer']:checked");
+      if (!selected) {
+        alert("답변을 선택해주세요.");
+        return;
       }
+      totalScore += parseInt(selected.value);
+      currentQuestion++;
 
+      if (currentQuestion < questions.length) {
+        showQuestion();
+      } else {
+        showResult();
+      }
+    }
+
+    function showResult() {
       let resultText = "";
-      if (score >= 16) resultText = `총점 ${score}점: 강한 계획형(J)`;
-      else if (score >= 11) resultText = `총점 ${score}점: 약한 계획형(J)`;
-      else if (score >= 6) resultText = `총점 ${score}점: 약한 인식형(P)`;
-      else resultText = `총점 ${score}점: 강한 인식형(P)`;
+      if (totalScore >= 16) resultText = `총점 ${totalScore}점: 강한 계획형(J)`;
+      else if (totalScore >= 11) resultText = `총점 ${totalScore}점: 약한 계획형(J)`;
+      else if (totalScore >= 6) resultText = `총점 ${totalScore}점: 약한 인식형(P)`;
+      else resultText = `총점 ${totalScore}점: 강한 인식형(P)`;
 
+      document.getElementById("quiz").style.display = "none";
       document.getElementById("result").innerText = resultText;
-    });
+    }
+
+    // Start quiz
+    showQuestion();
   </script>
 </body>
 </html>
-
