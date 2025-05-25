@@ -23,6 +23,12 @@
       width: 90%;
       text-align: center;
     }
+    .title {
+      font-size: 1.6em;
+      font-weight: bold;
+      margin-bottom: 20px;
+      color: #2c3e50;
+    }
     .question {
       font-size: 1.2em;
       margin-bottom: 20px;
@@ -49,12 +55,19 @@
       font-weight: bold;
       margin-top: 30px;
     }
+    .description {
+      margin-top: 10px;
+      font-size: 1em;
+      color: #555;
+    }
   </style>
 </head>
 <body>
   <div class="container">
+    <div class="title">MBTI J/P 유형 테스트</div>
     <div id="quiz"></div>
     <div class="result" id="result"></div>
+    <div class="description" id="description"></div>
   </div>
 
   <script>
@@ -105,13 +118,24 @@
 
     function showResult() {
       let resultText = "";
-      if (totalScore >= 16) resultText = `총점 ${totalScore}점: 강한 계획형(J)`;
-      else if (totalScore >= 11) resultText = `총점 ${totalScore}점: 약한 계획형(J)`;
-      else if (totalScore >= 6) resultText = `총점 ${totalScore}점: 약한 인식형(P)`;
-      else resultText = `총점 ${totalScore}점: 강한 인식형(P)`;
+      let description = "";
+      if (totalScore >= 16) {
+        resultText = `총점 ${totalScore}점: 강한 계획형(J)`;
+        description = "계획적이고 체계적인 성향이 강하게 나타납니다.";
+      } else if (totalScore >= 11) {
+        resultText = `총점 ${totalScore}점: 약한 계획형(J)`;
+        description = "계획을 선호하지만 약간의 유연함도 보입니다.";
+      } else if (totalScore >= 6) {
+        resultText = `총점 ${totalScore}점: 약한 인식형(P)`;
+        description = "유연하지만 필요시 계획도 잘 수립하는 편입니다.";
+      } else {
+        resultText = `총점 ${totalScore}점: 강한 인식형(P)`;
+        description = "즉흥적이고 자유로운 방식을 더 선호합니다.";
+      }
 
       document.getElementById("quiz").style.display = "none";
       document.getElementById("result").innerText = resultText;
+      document.getElementById("description").innerText = description;
     }
 
     // Start quiz
